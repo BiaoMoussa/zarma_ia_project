@@ -33,6 +33,26 @@ Building an AI assistant for **Zarma (Djerma)**, a Nigerien language spoken by s
 - **Other HF datasets**: `michsethowusu/english-zarma_sentence-pairs_mt560`, `27Group/noisy_zarma`, `27Group/Zarma_POS`, `abdouaziz/bible_zarma`, `birma091/zarma-tts-dataset`
 - **Dictionaries**: bisharat.net/Zarma, denisnddo.free.fr, fr.glosbe.com/fr/dje
 
+## Scripts
+
+| Script | Purpose |
+|---|---|
+| `scripts/clean_noisy_zarma.py` | Extract clean Zarma from noisy_zarma dataset |
+| `scripts/clean_bible_zarma.py` | Filter and deduplicate bible_zarma parallel pairs |
+| `scripts/translate_en_fr.py` | Translate English→French using Helsinki-NLP/opus-mt-en-fr |
+| `scripts/consolidate_corpus.py` | Merge all sources into final train/val/test splits |
+| `scripts/train_tokenizer.py` | Train BPE tokenizer for Zarma |
+| `scripts/train_tokenizer_fr.py` | Train BPE tokenizer for French |
+
+## Learning Resources (`cours/`)
+
+The `cours/` directory contains structured lessons written during the project:
+- `01-tokenisation.md` — BPE, vocabulary, special tokens, specialized vs generic tokenizers
+- `02-fine-tuning-lora.md` — Fine-tuning, LoRA, QLoRA, Unsloth, model selection
+- `03-pipeline-complet.md` — Full pipeline from text to trained model, technical glossary
+
+These are designed to be re-read independently. Future Claude instances should reference and enrich these courses.
+
 ## Project Phase
 
-Currently in **Phase 1 — Research & Preparation**: data cleaning, tokenizer building, dataset preparation. No training scripts or model code exist yet in this repo.
+Currently in **Phase 1 — Research & Preparation**: data cleaned, tokenizers trained, parallel corpus being consolidated. Translation of english-zarma (EN→FR) running in background.

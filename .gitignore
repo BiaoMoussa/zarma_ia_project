@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+.env.local
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model checkpoints & LoRA adapters (futur)
+checkpoints/
+lora_adapters/
+*.safetensors
+*.bin
+
+# Hugging Face cache
+.cache/huggingface/
+
+# Large datasets (raw audio déjà tracké, mais futurs gros fichiers)
+*.tar.gz
+*.zip
