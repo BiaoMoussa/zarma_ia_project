@@ -1,0 +1,15 @@
+# Dépendances pour le fine-tuning LoRA/QLoRA (scripts/train_lora.py).
+#
+# Séparées de requirements.txt car bitsandbytes nécessite un GPU CUDA :
+# incompatible avec ce Mac (Apple M4, pas de CUDA). À installer sur
+# l'environnement cloud (Colab, RunPod, Lambda Labs) qui exécutera
+# l'entraînement.
+
+peft==0.20.0
+accelerate==1.14.0
+bitsandbytes==0.50.0
+# trl a une réécriture majeure en 1.x ; on reste sur la série 0.x dont
+# l'API SFTTrainer/SFTConfig utilisée dans train_lora.py est bien connue.
+trl==0.21.0
+datasets==5.0.1
+sacrebleu==2.6.0

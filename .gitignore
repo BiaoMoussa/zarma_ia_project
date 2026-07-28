@@ -36,6 +36,9 @@ lora_adapters/
 # Raw datasets (téléchargeables via scripts/download_datasets.py)
 zarma_corpus/raw/
 
+# Dataset de fine-tuning (régénérable via scripts/prepare_finetune_dataset.py)
+zarma_corpus/finetune/
+
 # Archives
 *.tar.gz
 *.zip
