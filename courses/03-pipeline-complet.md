@@ -178,13 +178,16 @@ labels = torch.tensor([
 Corpus brut (CSV, TXT)
     │
     ▼ scripts/clean_noisy_zarma.py, clean_bible_zarma.py, translate_en_fr.py
-Corpus nettoyé (clean.text.dje.txt, clean.text.fr.txt, fr_dje_*.csv)
-    │
-    ▼ scripts/train_tokenizer.py, train_tokenizer_fr.py
-Tokenizers (bpe_zarma/, bpe_francais/)
+Corpus nettoyé (clean.text.dje.txt : 217,330 lignes, clean.text.fr.txt, fr_dje_aligned.csv,
+                 bible_cleaned.csv, en_dje_translated_fr_dje.csv)
     │
     ▼ scripts/consolidate_corpus.py
-Splits train/validation/test (fr_dje_train.csv, fr_dje_validation.csv, fr_dje_test.csv)
+Splits train/validation/test consolidés et dédupliqués
+(fr_dje_train.csv : 62,677 / fr_dje_validation.csv : 3,482 / fr_dje_test.csv : 3,483
+ → 69,642 paires uniques ; clean.text.fr.txt enrichi à 69,169 lignes)
+    │
+    ▼ scripts/train_tokenizer.py, train_tokenizer_fr.py
+Tokenizers (bpe_zarma/ : 32k vocab, bpe_francais/ : 16k vocab, entraînés sur le corpus enrichi)
     │
     ▼ (à venir) scripts/finetune.py
 Modèle fine-tuné FR ↔ Zarma

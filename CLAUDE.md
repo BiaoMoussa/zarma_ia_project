@@ -17,14 +17,14 @@ Building an AI assistant for **Zarma (Djerma)**, a Nigerien language spoken by s
 
 | Directory | Content |
 |---|---|
-| `raw/text/` | Original CSVs from Hugging Face datasets (Feriji, Bible, TTS metadata, etc.) |
+| `raw/text/` | Original CSVs from Hugging Face datasets (Feriji, Bible, english-zarma mt560, TTS metadata, etc.) |
 | `raw/audio/` | WAV files for TTS (zarma-tts-dataset) |
-| `cleaned/monolingual/` | ~33k lines each of Zarma and French plain text |
-| `cleaned/parallel/` | `fr_dje_aligned.csv` — 33,059 aligned French→Zarma sentence pairs |
-| `tokenizer/` | JSON tokenizer configs for French and Zarma |
-| `train/` | 26,120 lines Zarma + parallel French for training |
-| `validation/` | Validation split |
-| `test/` | Test split |
+| `cleaned/monolingual/` | 217,330 lines Zarma (`clean.text.dje.txt`) / 69,169 lines French (`clean.text.fr.txt`) |
+| `cleaned/parallel/` | `fr_dje_aligned.csv` (Feriji, 33,059 pairs) + `bible_cleaned.csv` (6,300 pairs) + `en_dje_translated_fr_dje.csv` (EN→FR translated, 60,515 pairs) → consolidated into `fr_dje_{train,validation,test}.csv`, 69,642 unique pairs total |
+| `tokenizer/` | JSON tokenizer configs for French and Zarma (BPE, retrained on enriched corpus) |
+| `train/` | 62,677 lines Zarma + parallel French for training |
+| `validation/` | 3,482 lines validation split |
+| `test/` | 3,483 lines test split |
 
 ## Key External Resources
 
@@ -55,4 +55,4 @@ These are designed to be re-read independently. Future Claude instances should r
 
 ## Project Phase
 
-Currently in **Phase 1 — Research & Preparation**: data cleaned, tokenizers trained, parallel corpus being consolidated. Translation of english-zarma (EN→FR) running in background.
+Currently in **Phase 1 — Research & Preparation**: data cleaned, EN→FR translation of english-zarma complete, parallel corpus consolidated (69,642 unique pairs, up from ~32.6k), and tokenizers retrained on the enriched corpus. Next: fine-tuning setup (LoRA/QLoRA).
