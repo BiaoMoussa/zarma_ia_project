@@ -42,3 +42,6 @@ zarma_corpus/finetune/
 # Archives
 *.tar.gz
 *.zip
+
+# Résultats d'évaluation (régénérables via scripts/evaluate.py)
+eval_results/

@@ -2,8 +2,13 @@
 Étape 5 — Préparation du dataset de fine-tuning LoRA (format chat).
 
 Convertit les paires FR↔Zarma consolidées (fr_dje_{train,validation,test}.csv)
-en JSONL au format "messages" (system/user/assistant) attendu par TRL SFTTrainer
-et le chat template de Qwen2.5-Instruct.
+en JSONL au format conversationnel « prompt / completion » de TRL :
+- prompt     : messages system + user (l'instruction de traduction)
+- completion : message assistant (la traduction attendue)
+
+Avec ce format, SFTTrainer ne calcule la perte QUE sur la traduction
+(completion_only_loss) : le modèle n'apprend pas à recopier le prompt système,
+identique dans tous les exemples.
 
 Chaque paire produit deux exemples : FR→Zarma et Zarma→FR (entraînement
 bidirectionnel), avec des instructions variées pour éviter que le modèle
@@ -46,11 +51,13 @@ SPLITS = ["train", "validation", "test"]
 def build_example(instruction_templates, source_text, target_text):
     instruction = random.choice(instruction_templates).format(text=source_text)
     return {
-        "messages": [
+        "prompt": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": instruction},
+        ],
+        "completion": [
             {"role": "assistant", "content": target_text},
-        ]
+        ],
     }
 
 
