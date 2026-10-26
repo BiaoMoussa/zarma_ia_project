@@ -19,12 +19,12 @@ Building an AI assistant for **Zarma (Djerma)**, a Nigerien language spoken by s
 |---|---|
 | `raw/text/` | Original CSVs from Hugging Face datasets (Feriji, Bible, english-zarma mt560, TTS metadata, etc.) |
 | `raw/audio/` | WAV files for TTS (zarma-tts-dataset) |
-| `cleaned/monolingual/` | 217,330 lines Zarma (`clean.text.dje.txt`) / 69,169 lines French (`clean.text.fr.txt`) |
-| `cleaned/parallel/` | `fr_dje_aligned.csv` (Feriji, 33,059 pairs) + `bible_cleaned.csv` (6,300 pairs) + `en_dje_translated_fr_dje.csv` (EN→FR translated, 60,515 pairs) → consolidated into `fr_dje_{train,validation,test}.csv`, 69,642 unique pairs total |
-| `tokenizer/` | JSON tokenizer configs for French and Zarma (BPE, retrained on enriched corpus) |
-| `train/` | 62,677 lines Zarma + parallel French for training |
-| `validation/` | 3,482 lines validation split |
-| `test/` | 3,483 lines test split |
+| `cleaned/monolingual/` | ~131k lines Zarma (`clean.text.dje.txt`) / ~65k lines French (`clean.text.fr.txt`), normalized, near-duplicates and validation/test sentences removed |
+| `cleaned/parallel/` | `fr_dje_aligned.csv` (Feriji, 33,059 pairs) + `bible_cleaned.csv` (6,300 pairs) + `en_dje_translated_fr_dje.csv` (EN→FR translated, 60,515 pairs) → consolidated into `fr_dje_{train,validation,test}.csv` (columns `fr,dje,source`), 37,852 unique pairs. Most mt560 pairs are the same Bible verses as Feriji (Moses-tokenized), so they collapse after normalization |
+| `tokenizer/` | JSON tokenizer configs for French and Zarma (BPE). Trained before the normalization pass — retrain if needed; pedagogical only, Qwen fine-tuning keeps its own tokenizer |
+| `train/` | 34,068 lines Zarma + parallel French for training |
+| `validation/` | 1,892 lines validation split |
+| `test/` | 1,892 lines test split |
 
 ## Key External Resources
 
@@ -40,13 +40,17 @@ Building an AI assistant for **Zarma (Djerma)**, a Nigerien language spoken by s
 | `scripts/clean_noisy_zarma.py` | Extract clean Zarma from noisy_zarma dataset |
 | `scripts/clean_bible_zarma.py` | Filter and deduplicate bible_zarma parallel pairs |
 | `scripts/translate_en_fr.py` | Translate English→French using Helsinki-NLP/opus-mt-en-fr |
-| `scripts/consolidate_corpus.py` | Merge all sources into final train/val/test splits |
+| `scripts/normalize.py` | Shared orthographic normalization (NFC, Moses detokenization) and quality filters |
+| `scripts/consolidate_corpus.py` | Normalize, filter misaligned verses, deduplicate, leak-free grouped train/val/test splits |
 | `scripts/train_tokenizer.py` | Train BPE tokenizer for Zarma |
 | `scripts/train_tokenizer_fr.py` | Train BPE tokenizer for French |
+| `scripts/prepare_finetune_dataset.py` | Build prompt/completion JSONL for TRL (loss on the translation only) |
+| `scripts/train_lora.py` | QLoRA fine-tuning of Qwen2.5-7B-Instruct (auto bf16/fp16, auto-resume, `--train-fraction` for short runs) |
+| `scripts/evaluate.py` | chrF++ / BLEU evaluation, baseline vs LoRA adapter, optional custom test CSV |
 
-## Learning Resources (`cours/`)
+## Learning Resources (`courses/`)
 
-The `cours/` directory contains structured lessons written during the project:
+The `courses/` directory contains structured lessons written during the project:
 - `01-tokenisation.md` — BPE, vocabulary, special tokens, specialized vs generic tokenizers
 - `02-fine-tuning-lora.md` — Fine-tuning, LoRA, QLoRA, Unsloth, model selection
 - `03-pipeline-complet.md` — Full pipeline from text to trained model, technical glossary
@@ -55,4 +59,4 @@ These are designed to be re-read independently. Future Claude instances should r
 
 ## Project Phase
 
-Currently in **Phase 1 — Research & Preparation**: data cleaned, EN→FR translation of english-zarma complete, parallel corpus consolidated (69,642 unique pairs, up from ~32.6k), and tokenizers retrained on the enriched corpus. Next: fine-tuning setup (LoRA/QLoRA).
+Currently in **Phase 1 — Research & Preparation**: corpus normalized and re-split without train/test leakage (37,852 unique pairs; the earlier 69,642 figure counted Moses-tokenized duplicates), fine-tuning and evaluation scripts ready. Next: run the baseline evaluation, a short QLoRA run, and build a native-speaker-reviewed everyday test set (the corpus is overwhelmingly biblical).

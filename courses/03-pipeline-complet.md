@@ -134,6 +134,22 @@ Voir le [Cours 2 — Fine-tuning et LoRA](02-fine-tuning-lora.md).
 }
 ```
 
+Dans ce projet, on utilise la variante **prompt / completion** de TRL
+(`scripts/prepare_finetune_dataset.py`) : le prompt contient les messages
+system + user, la completion le message assistant. SFTTrainer ne calcule alors
+la perte que sur la traduction (`completion_only_loss`), et pas sur le prompt
+système répété dans tous les exemples.
+
+```json
+{
+  "prompt": [
+    {"role": "system", "content": "Tu es un traducteur français → zarma."},
+    {"role": "user", "content": "Traduis en zarma : Les enfants sont nus."}
+  ],
+  "completion": [{"role": "assistant", "content": "Zankey go koonu"}]
+}
+```
+
 Ou en format plus simple :
 
 ```
@@ -181,17 +197,37 @@ Corpus brut (CSV, TXT)
 Corpus nettoyé (clean.text.dje.txt : 217,330 lignes, clean.text.fr.txt, fr_dje_aligned.csv,
                  bible_cleaned.csv, en_dje_translated_fr_dje.csv)
     │
-    ▼ scripts/consolidate_corpus.py
-Splits train/validation/test consolidés et dédupliqués
-(fr_dje_train.csv : 62,677 / fr_dje_validation.csv : 3,482 / fr_dje_test.csv : 3,483
- → 69,642 paires uniques ; clean.text.fr.txt enrichi à 69,169 lignes)
+    ▼ scripts/consolidate_corpus.py (+ scripts/normalize.py)
+Splits train/validation/test normalisés, filtrés et sans fuite
+(fr_dje_train.csv : 34,068 / fr_dje_validation.csv : 1,892 / fr_dje_test.csv : 1,892
+ → 37,852 paires uniques ; voir « Leçons tirées du nettoyage » ci-dessous)
     │
     ▼ scripts/train_tokenizer.py, train_tokenizer_fr.py
-Tokenizers (bpe_zarma/ : 32k vocab, bpe_francais/ : 16k vocab, entraînés sur le corpus enrichi)
+Tokenizers (bpe_zarma/ : 32k vocab, bpe_francais/ : 16k vocab — pédagogiques,
+            non utilisés par le fine-tuning de Qwen qui garde son propre tokenizer)
     │
-    ▼ (à venir) scripts/finetune.py
-Modèle fine-tuné FR ↔ Zarma
+    ▼ scripts/prepare_finetune_dataset.py → zarma_corpus/finetune/*.jsonl
+    ▼ scripts/train_lora.py (QLoRA, reprise automatique depuis checkpoint)
+Adaptateur LoRA FR ↔ Zarma
+    │
+    ▼ scripts/evaluate.py (chrF++ / BLEU, baseline vs fine-tuné)
+Scores par direction
 ```
+
+### Leçons tirées du nettoyage
+
+- **Le corpus « 69 642 paires » était gonflé.** mt560 contient les mêmes versets
+  que Feriji, mais tokenisés à la manière de Moses (`n 'ay`, `@-@`). Une fois
+  l'orthographe normalisée, il ne reste qu'environ 38 000 phrases zarma distinctes.
+- **Ces doublons créaient une fuite massive** : un verset pouvait être en train
+  sous sa forme Moses et en test sous sa forme Feriji. Le split regroupe
+  désormais les quasi-doublons (même français ou même zarma) dans un seul split.
+- **Les versets à numérotation différente sont décalés** : quand le français de
+  Feriji commence par « (55:16) », la phrase zarma correspond à un autre verset.
+  Ces phrases zarma sont écartées dans toutes les sources.
+- **Le corpus reste très majoritairement biblique** : les scores sur ce test ne
+  disent rien de la qualité sur des phrases du quotidien. Il faut un jeu de test
+  « réel » relu par des locuteurs natifs (`evaluate.py --test-csv`).
 
 ---
 
